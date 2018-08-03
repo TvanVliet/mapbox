@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
     <meta charset='utf-8' />
@@ -115,6 +115,454 @@ map.on('load', function() {
     });
     map.on('mouseleave', 'clusters', function () {
         map.getCanvas().style.cursor = '';
+    });
+});
+</script>
+
+</body>
+</html> -->
+
+
+<!-- https://www.mapbox.com/mapbox-gl-js/example/filter-markers/ -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Filter symbols by toggling a list</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.47.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.47.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:80%; }
+    </style>
+</head>
+<body>
+
+<style>
+    .filter-group {
+        font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+        font-weight: 600;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1;
+        border-radius: 3px;
+        width: 120px;
+        color: #fff;
+    }
+
+    .filter-group input[type=checkbox]:first-child + label {
+        border-radius: 3px 3px 0 0;
+    }
+
+    .filter-group label:last-child {
+        border-radius: 0 0 3px 3px;
+        border: none;
+    }
+
+    .filter-group input[type=checkbox] {
+        display: none;
+    }
+
+    .filter-group input[type=checkbox] + label {
+        background-color: #3386c0;
+        display: block;
+        cursor: pointer;
+        padding: 10px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    }
+
+    .filter-group input[type=checkbox] + label {
+        background-color: #3386c0;
+        text-transform: capitalize;
+    }
+
+    .filter-group input[type=checkbox] + label:hover,
+    .filter-group input[type=checkbox]:checked + label {
+        background-color: #4ea0da;
+    }
+
+    .filter-group input[type=checkbox]:checked + label:before {
+        content: '✔';
+        margin-right: 5px;
+    }
+</style>
+<div id='map'></div>
+<nav id='filter-group' class='filter-group'></nav>
+
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoidGltaWJtIiwiYSI6ImNqa2M4cnZ5aDJ1anczcW5jNGJ0bTgweDEifQ.vybx1QrlJySZsoyiG-h8EQ';
+// var places = {
+//     "type": "FeatureCollection",
+//     "features": [{
+//         "type": "Feature",
+//         "properties": {
+//             "icon": "theatre"
+//         },
+//         "geometry": {
+//             "type": "Point",
+//             "coordinates": [-77.038659, 38.931567]
+//         }
+//     }, {
+//         "type": "Feature",
+//         "properties": {
+//             "icon": "theatre"
+//         },
+//         "geometry": {
+//             "type": "Point",
+//             "coordinates": [-77.003168, 38.894651]
+//         }
+//     }, {
+//         "type": "Feature",
+//         "properties": {
+//             "icon": "bar"
+//         },
+//         "geometry": {
+//             "type": "Point",
+//             "coordinates": [-77.090372, 38.881189]
+//         }
+//     }, {
+//         "type": "Feature",
+//         "properties": {
+//             "icon": "bicycle"
+//         },
+//         "geometry": {
+//             "type": "Point",
+//             "coordinates": [-77.052477, 38.943951]
+//         }
+//     }, {
+//         "type": "Feature",
+//         "properties": {
+//             "icon": "music"
+//         },
+//         "geometry": {
+//             "type": "Point",
+//             "coordinates": [-77.031706, 38.914581]
+//         }
+//     }, {
+//         "type": "Feature",
+//         "properties": {
+//             "icon": "music"
+//         },
+//         "geometry": {
+//             "type": "Point",
+//             "coordinates": [-77.020945, 38.878241]
+//         }
+//     }, {
+//         "type": "Feature",
+//         "properties": {
+//             "icon": "music"
+//         },
+//         "geometry": {
+//             "type": "Point",
+//             "coordinates": [-77.007481, 38.876516]
+//         }
+//     }]
+// };
+
+var gpsLocation = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+          "icon": "music"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              32.741661071777344,
+              40.03234636708094
+            ],
+            [
+              32.774620056152344,
+              40.018938380663975
+            ],
+            [
+              32.8216552734375,
+              40.08411324879266
+            ],
+            [
+              32.760887145996094,
+              40.13137854967967
+            ],
+            [
+              32.66441345214844,
+              40.12297822992295
+            ],
+            [
+              32.6513671875,
+              40.07386810509482
+            ],
+            [
+              32.741661071777344,
+              40.03234636708094
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+          "icon": "music"
+        },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              32.67059326171875,
+              39.942910023503146
+            ],
+            [
+              32.706298828125,
+              39.942910023503146
+            ],
+            [
+              32.706298828125,
+              39.96212240336062
+            ],
+            [
+              32.67059326171875,
+              39.96212240336062
+            ],
+            [
+              32.67059326171875,
+              39.942910023503146
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "icon": "bar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.699432373046875,
+          39.951069364619535
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "icon": "music"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.68878936767578,
+          39.952648479526374
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "icon": "music"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.700462341308594,
+          39.9436996796908
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "icon": "bicycle"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.690162658691406,
+          39.94448932676474
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "icon": "bar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.69462585449219,
+          39.956596107293855
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "icon": "music"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.681922912597656,
+          39.945805384968494
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "icon": "music"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.679176330566406,
+          39.9573856055042
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "icon": "music"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.673683166503906,
+          39.95501708352986
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "icon": "bicycle"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.674713134765625,
+          39.94396289639476
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "icon": "bar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.7667236328125,
+          40.01289077952615
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "icon": "music"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.76981353759765,
+          40.035237940230076
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "icon": "bicycle"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.75676727294922,
+          40.03366073371033
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "icon": "bar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.77015686035156,
+          40.04732864506094
+        ]
+      }
+    }
+  ]
+};
+
+
+
+var filterGroup = document.getElementById('filter-group');
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/light-v9',
+    center: [32.7, 40],
+    zoom: 11.15
+});
+
+map.on('load', function() {
+    // Add a GeoJSON source containing place coordinates and information.
+    map.addSource("gpsLocation", {
+        "type": "geojson",
+        "data": gpsLocation
+    });
+
+    gpsLocation.features.forEach(function(feature) {
+        var symbol = feature.properties['icon'];
+        var layerID = 'poi-' + symbol;
+
+        // Add a layer for this symbol type if it hasn't been added already.
+        if (!map.getLayer(layerID)) {
+            map.addLayer({
+                "id": layerID,
+                "type": "symbol",
+                "source": "gpsLocation",
+                "layout": {
+                    "icon-image": symbol + "-15",
+                    "icon-allow-overlap": true
+                },
+                "filter": ["==", "icon", symbol]
+            });
+
+            // Add checkbox and label elements for the layer.
+            var input = document.createElement('input');
+            input.type = 'checkbox';
+            input.id = layerID;
+            input.checked = true;
+            filterGroup.appendChild(input);
+
+            var label = document.createElement('label');
+            label.setAttribute('for', layerID);
+            label.textContent = symbol;
+            filterGroup.appendChild(label);
+
+            // When the checkbox changes, update the visibility of the layer.
+            input.addEventListener('change', function(e) {
+                map.setLayoutProperty(layerID, 'visibility',
+                    e.target.checked ? 'visible' : 'none');
+            });
+        }
     });
 });
 </script>
